@@ -118,7 +118,7 @@
                 <a href="#problem" class="nav-link text-gray-600 font-semibold">Vấn Đề</a>
                 <a href="#process" class="nav-link text-gray-600 font-semibold">Quy Trình</a>
                 <a href="#solution" class="nav-link text-gray-600 font-semibold">Giải Pháp</a>
-                <button id="open-modal" class="nav-link text-gray-600 font-semibold cursor-pointer">Nguyên Mẫu</button>
+                <button id="open-modal" class="nav-link text-gray-600 font-semibold cursor-pointer">Prototype</button>
                 <a href="#result" class="nav-link text-gray-600 font-semibold">Kết Quả</a>
             </div>
         </nav>
@@ -229,7 +229,12 @@
     <div id="prototype-modal" class="modal">
         <span class="close-button" id="close-modal">&times;</span>
         <div class="modal-content text-center">
-            <img src="https://placehold.co/400x800/d1d1d1/5e5e5e?text=Demo+Giao+diện+nguyên+mẫu+mới" alt="Demo Giao diện ứng dụng mới" class="rounded-lg shadow-2xl">
+            <!-- Thêm một div để chứa các hình ảnh và sử dụng flexbox của Tailwind -->
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                <img src="URL_HINH_ANH_1" alt="Mô tả hình ảnh 1" class="rounded-lg shadow-2xl w-full md:w-1/2">
+                <img src="URL_HINH_ANH_2" alt="Mô tả hình ảnh 2" class="rounded-lg shadow-2xl w-full md:w-1/2">
+                <img src="URL_HINH_ANH_3" alt="Mô tả hình ảnh 3" class="rounded-lg shadow-2xl w-full md:w-1/2">
+            </div>
         </div>
     </div>
 
