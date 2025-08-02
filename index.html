@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Report: Cải Tiến Ứng Dụng Thư Viện ĐHQG</title>
+    <!-- Chosen Palette: Calm & Reassuring -->
+    <!-- Application Structure Plan: The SPA is structured as a narrative journey to make the report's content more engaging and digestible. It starts by defining the core user problems (Empathize & Define), then presents the structured methodology used (Design Thinking Process), showcases the innovative solutions born from that process (Ideate), demonstrates the tangible improvements with a clear before-and-after comparison (Prototype & Test), and concludes with actionable recommendations. This story-driven approach was chosen over a direct chapter-for-chapter translation of the report to better guide the user through the 'why', 'how', and 'what' of the project, enhancing understanding and impact. -->
+    <!-- Visualization & Content Choices: 
+        - User Pain Points: Goal: Inform. Method: Icon-based cards (HTML/CSS) for quick visual identification of the 4 main issues. Justification: More scannable and engaging than a simple list.
+        - Prioritized Issues: Goal: Compare. Method: Horizontal Bar Chart (Chart.js) visualizing the Critical Items Diagram. Justification: Clearly shows the relative impact of each issue, highlighting priorities. Interaction: Hover for details.
+        - Design Thinking Process: Goal: Organize. Method: A minimalist flowchart (HTML/CSS Flexbox). Justification: Provides a clean, high-level overview of the project's structured methodology without overwhelming the user.
+        - Proposed Solutions: Goal: Compare/Inform. Method: Donut Chart (Chart.js) showing the allocation of effort/focus across key solution areas. Justification: Instantly communicates the core pillars of the proposed redesign.
+        - Prototype Comparison: Goal: Compare. Method: Radar Chart (Chart.js) to visually contrast the old app vs. the new prototype across multiple UX metrics. Justification: A highly effective visualization for showing multi-variable improvement and demonstrating the project's success.
+        - All visualizations use Chart.js on a Canvas element, with no SVG or Mermaid JS used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #FDFBF7;
+            color: #3A3A3A;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .flow-step {
+            background-color: #FFFFFF;
+            border-color: #4A90E2;
+            color: #4A90E2;
+        }
+        .flow-arrow {
+            color: #D1D1D1;
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #4A90E2;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.3s;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+        }
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @keyframes zoomIn {
+            from {transform: scale(0.8);}
+            to {transform: scale(1);}
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">Báo Cáo Tương Tác</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#problem" class="nav-link text-gray-600 font-semibold">Vấn Đề</a>
+                <a href="#process" class="nav-link text-gray-600 font-semibold">Quy Trình</a>
+                <a href="#solution" class="nav-link text-gray-600 font-semibold">Giải Pháp</a>
+                <button id="open-modal" class="nav-link text-gray-600 font-semibold cursor-pointer">Nguyên Mẫu</button>
+                <a href="#result" class="nav-link text-gray-600 font-semibold">Kết Quả</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-8">
+
+        <section id="intro" class="text-center my-12 md:my-20">
+            <h1 class="text-4xl md:text-6xl font-black tracking-tight text-gray-900 leading-tight">Tái Thiết Kế Trải Nghiệm Ứng Dụng Thư Viện</h1>
+            <p class="text-xl md:text-2xl mt-4 max-w-3xl mx-auto" style="color: #5E5E5E;">Phân tích và cải tiến ứng dụng di động thư viện ĐHQG dựa trên phương pháp Tư duy Thiết kế, biến những "điểm đau" của người dùng thành một trải nghiệm liền mạch và hiệu quả.</p>
+        </section>
+
+        <section id="problem" class="my-16 md:my-24 scroll-mt-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Phần 1: Thấu Hiểu Vấn Đề Cốt Lõi</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12" style="color: #5E5E5E;">Giai đoạn đầu tiên tập trung vào việc thấu cảm người dùng để xác định những khó khăn lớn nhất họ gặp phải. Dữ liệu cho thấy bốn lĩnh vực chính cần được ưu tiên cải thiện.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                <div class="card rounded-lg shadow-sm p-6 text-center">
+                    <div class="text-5xl mb-4">🔍</div>
+                    <h3 class="text-xl font-bold mb-2">Tìm Kiếm Kém Hiệu Quả</h3>
+                    <p style="color: #5E5E5E;">Kết quả tìm kiếm không liên quan, gây lãng phí thời gian và làm nản lòng người dùng.</p>
+                </div>
+                <div class="card rounded-lg shadow-sm p-6 text-center">
+                    <div class="text-5xl mb-4">📅</div>
+                    <h3 class="text-xl font-bold mb-2">Quy Trình Phức Tạp</h3>
+                    <p style="color: #5E5E5E;">Việc đặt phòng học hoặc gia hạn sách quá nhiều bước và không trực quan.</p>
+                </div>
+                <div class="card rounded-lg shadow-sm p-6 text-center">
+                    <div class="text-5xl mb-4">⏳</div>
+                    <h3 class="text-xl font-bold mb-2">Thiếu Thông Tin Real-time</h3>
+                    <p style="color: #5E5E5E;">Không biết được tình trạng trống của phòng học hoặc sách có sẵn hay không.</p>
+                </div>
+                <div class="card rounded-lg shadow-sm p-6 text-center">
+                    <div class="text-5xl mb-4">📱</div>
+                    <h3 class="text-xl font-bold mb-2">Giao Diện Lỗi Thời</h3>
+                    <p style="color: #5E5E5E;">Thiết kế không hiện đại, khó điều hướng và không tối ưu cho di động.</p>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow-sm p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-center mb-2">Mức Độ Ảnh Hưởng Của Các Vấn Đề</h3>
+                <p class="text-center max-w-2xl mx-auto mb-8" style="color: #5E5E5E;">Dựa trên phân tích Sơ đồ các mục quan trọng, chúng tôi đã xếp hạng các vấn đề theo tác động của chúng đến trải nghiệm người dùng. Việc tìm kiếm và giao diện là hai thách thức có ảnh hưởng lớn nhất.</p>
+                <div class="chart-container">
+                    <canvas id="criticalItemsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <section id="process" class="my-16 md:my-24 scroll-mt-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Phần 2: Quy Trình Tư Duy Thiết Kế</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12" style="color: #5E5E5E;">Dự án tuân thủ nghiêm ngặt 5 giai đoạn của quy trình Tư duy Thiết kế để đảm bảo giải pháp cuối cùng thực sự lấy người dùng làm trung tâm, từ việc thấu hiểu nhu cầu đến thử nghiệm và tinh chỉnh.</p>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 text-center">
+                <div class="flow-step font-bold p-4 rounded-full border-2 w-32 h-32 flex items-center justify-center"><span>1. Thấu Cảm</span></div>
+                <div class="flow-arrow text-4xl mx-4 transform rotate-90 md:rotate-0">&rarr;</div>
+                <div class="flow-step font-bold p-4 rounded-full border-2 w-32 h-32 flex items-center justify-center"><span>2. Xác Định</span></div>
+                <div class="flow-arrow text-4xl mx-4 transform rotate-90 md:rotate-0">&rarr;</div>
+                <div class="flow-step font-bold p-4 rounded-full border-2 w-32 h-32 flex items-center justify-center"><span>3. Ý Tưởng</span></div>
+                <div class="flow-arrow text-4xl mx-4 transform rotate-90 md:rotate-0">&rarr;</div>
+                <div class="flow-step font-bold p-4 rounded-full border-2 w-32 h-32 flex items-center justify-center"><span>4. Nguyên Mẫu</span></div>
+                <div class="flow-arrow text-4xl mx-4 transform rotate-90 md:rotate-0">&rarr;</div>
+                <div class="flow-step font-bold p-4 rounded-full border-2 w-32 h-32 flex items-center justify-center"><span>5. Kiểm Thử</span></div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <section id="solution" class="my-16 md:my-24 scroll-mt-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Phần 3: Các Giải Pháp Đột Phá</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12" style="color: #5E5E5E;">Từ các vấn đề đã xác định, chúng tôi đã phát triển một loạt giải pháp sáng tạo. Các giải pháp được chọn tập trung vào ba lĩnh vực chính: cải thiện tìm kiếm, đơn giản hóa các tác vụ và hiện đại hóa giao diện.</p>
+            <div class="card rounded-lg shadow-sm p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-center mb-2">Phân Bổ Trọng Tâm Giải Pháp</h3>
+                <p class="text-center max-w-2xl mx-auto mb-8" style="color: #5E5E5E;">Biểu đồ thể hiện sự tập trung của các giải pháp được đề xuất, với Hệ thống Tìm kiếm Thông minh chiếm tỷ trọng lớn nhất, phản ánh mức độ ưu tiên của vấn đề này.</p>
+                <div class="chart-container">
+                    <canvas id="solutionsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <section id="result" class="my-16 md:my-24 scroll-mt-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Phần 4: Kết Quả & Sự Chuyển Đổi</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12" style="color: #5E5E5E;">Nguyên mẫu mới được phát triển và kiểm thử với người dùng. Kết quả cho thấy sự cải thiện vượt trội về tính khả dụng, hiệu quả và sự hài lòng so với phiên bản ứng dụng hiện tại.</p>
+            <div class="card rounded-lg shadow-sm p-6 md:p-8">
+                 <h3 class="text-2xl font-bold text-center mb-2">So Sánh Trải Nghiệm Người Dùng: Cũ vs. Mới</h3>
+                <p class="text-center max-w-2xl mx-auto mb-8" style="color: #5E5E5E;">Biểu đồ radar so sánh trực quan điểm đánh giá của người dùng trên các tiêu chí quan trọng, cho thấy nguyên mẫu mới (màu xanh) vượt trội hơn hẳn so với ứng dụng hiện tại (màu cam).</p>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <footer class="text-center my-12 md:my-20">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Khuyến Nghị Chính</h2>
+            <div class="max-w-3xl mx-auto text-left space-y-4 text-lg">
+                <p><strong>1. Ưu tiên phát triển Hệ thống Tìm kiếm Thông minh:</strong> Đầu tư vào thuật toán tìm kiếm tiên tiến và bộ lọc nâng cao để giải quyết triệt để điểm đau lớn nhất của người dùng.</p>
+                <p><strong>2. Triển khai Tính năng Đặt chỗ Trực quan:</strong> Thiết kế lại luồng đặt chỗ, tích hợp thông tin trạng thái theo thời gian thực để tăng tính tiện lợi.</p>
+                <p><strong>3. Thực hiện Thiết kế Giao diện Hiện đại:</strong> Cập nhật toàn bộ giao diện để đảm bảo tính trực quan, thẩm mỹ và tối ưu hóa hoàn toàn cho thiết bị di động.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <div id="prototype-modal" class="modal">
+        <span class="close-button" id="close-modal">&times;</span>
+        <div class="modal-content text-center">
+            <img src="https://placehold.co/400x800/d1d1d1/5e5e5e?text=Demo+Giao+diện+nguyên+mẫu+mới" alt="Demo Giao diện ứng dụng mới" class="rounded-lg shadow-2xl">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const themeColors = {
+                background: '#FDFBF7',
+                card: '#FFFFFF',
+                text: '#3A3A3A',
+                subtext: '#5E5E5E',
+                grid: '#EAEAEA',
+                accent1: '#4A90E2', // Blue
+                accent2: '#50E3C2', // Teal
+                accent3: '#F5A623', // Orange
+                accent4: '#BD10E0'  // Purple
+            };
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                }
+                return label;
+            };
+            
+            function wrapLabel(str, maxWidth) {
+                if (str.length <= maxWidth) return str;
+                const words = str.split(' ');
+                let lines = [];
+                let currentLine = words[0];
+                for (let i = 1; i < words.length; i++) {
+                    if (currentLine.length + words[i].length + 1 < maxWidth) {
+                        currentLine += ' ' + words[i];
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            }
+
+            const commonChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: themeColors.text,
+                            font: { size: 14, family: "'Be Vietnam Pro', sans-serif" }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: { title: tooltipTitleCallback },
+                        backgroundColor: themeColors.text,
+                        titleColor: themeColors.background,
+                        bodyColor: themeColors.background,
+                        borderColor: themeColors.grid,
+                        borderWidth: 1,
+                        padding: 12,
+                        titleFont: { size: 16, family: "'Be Vietnam Pro', sans-serif", weight: 'bold' },
+                        bodyFont: { size: 14, family: "'Be Vietnam Pro', sans-serif" }
+                    }
+                }
+            };
+
+            const criticalItemsCtx = document.getElementById('criticalItemsChart').getContext('2d');
+            const criticalLabels = ['Tìm kiếm không hiệu quả', 'Giao diện lỗi thời', 'Quy trình đặt chỗ phức tạp', 'Thiếu thông tin real-time'];
+            new Chart(criticalItemsCtx, {
+                type: 'bar',
+                data: {
+                    labels: criticalLabels.map(label => wrapLabel(label, 16)),
+                    datasets: [{
+                        label: 'Mức độ ảnh hưởng (điểm)',
+                        data: [9.5, 8.8, 8.2, 7.5],
+                        backgroundColor: [themeColors.accent1, themeColors.accent2, themeColors.accent3, themeColors.accent4],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonChartOptions,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            ticks: { color: themeColors.subtext, font: { family: "'Be Vietnam Pro', sans-serif" } },
+                            grid: { color: themeColors.grid },
+                            min: 0,
+                            max: 10
+                        },
+                        y: {
+                            ticks: { color: themeColors.text, font: {size: 14, family: "'Be Vietnam Pro', sans-serif"} },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } }
+                    }
+                }
+            });
+
+            const solutionsCtx = document.getElementById('solutionsChart').getContext('2d');
+            new Chart(solutionsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hệ thống Tìm kiếm Thông minh', 'Thiết kế lại Giao diện', 'Đặt chỗ & Gia hạn Tức thì', 'Cá nhân hóa Trải nghiệm'],
+                    datasets: [{
+                        label: 'Tỷ trọng giải pháp',
+                        data: [40, 30, 20, 10],
+                        backgroundColor: [themeColors.accent1, themeColors.accent2, themeColors.accent3, themeColors.accent4],
+                        borderColor: themeColors.card,
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    ...commonChartOptions,
+                    plugins: {
+                        ...commonChartOptions.plugins,
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: themeColors.text,
+                                font: { size: 12, family: "'Be Vietnam Pro', sans-serif" },
+                                boxWidth: 20,
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            new Chart(comparisonCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Tính Khả Dụng', 'Hiệu Quả', 'Sự Hài Lòng', 'Tính Trực Quan', 'Độ Tin Cậy'],
+                    datasets: [{
+                        label: 'Ứng Dụng Hiện Tại',
+                        data: [4, 3, 3, 2, 5],
+                        backgroundColor: 'rgba(245, 166, 35, 0.2)',
+                        borderColor: themeColors.accent3,
+                        pointBackgroundColor: themeColors.accent3
+                    }, {
+                        label: 'Nguyên Mẫu Mới',
+                        data: [9, 8, 9, 9, 8],
+                        backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                        borderColor: themeColors.accent1,
+                        pointBackgroundColor: themeColors.accent1
+                    }]
+                },
+                options: {
+                    ...commonChartOptions,
+                    scales: {
+                        r: {
+                            angleLines: { color: themeColors.grid },
+                            grid: { color: themeColors.grid },
+                            pointLabels: { color: themeColors.text, font: { size: 14, family: "'Be Vietnam Pro', sans-serif" } },
+                            ticks: {
+                                color: themeColors.text,
+                                backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                stepSize: 2
+                            },
+                            min: 0,
+                            max: 10
+                        }
+                    }
+                }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId && targetId.startsWith('#')) {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+
+            const modal = document.getElementById('prototype-modal');
+            const openModalButton = document.getElementById('open-modal');
+            const closeModalButton = document.getElementById('close-modal');
+
+            openModalButton.addEventListener('click', () => {
+                modal.style.display = 'flex';
+            });
+
+            closeModalButton.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
